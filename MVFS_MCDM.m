@@ -1,7 +1,15 @@
 clc;clear all;
 
+addpath('./FL');
+addpath('./gspbox-master');
+addpath('./MinMaxSelection');
 addpath('./util');
+addpath('./util1');
+addpath('./util2');
+addpath('./utils');
+addpath('./src');
 addpath('./datasets');
+gsp_start;
 a='yale_mtv';
 
 filename=['datasets\',a,'.mat'];
@@ -21,10 +29,7 @@ for i = 1:numViews
     normalizedFea{i} = minMaxNormalize(currentViewData);
 end
 fea=normalizedFea;
-%% ====== ADD PCA PREPROCESSING ======
-% Reduce dimensionality while retaining 95% variance
-varianceRetained = 0.95;
-fea = applyPCA(fea, varianceRetained);
+
 %%
 n=size(fea{1},1);
 for num = 1:v
@@ -66,10 +71,11 @@ for i = 1:numViews
 
 
         %Laplacian Score       
-        M6=zeros(feature_num,1);
-        W = dist(currentViewData');
-        W = -W./max(max(W)); % it's a similarity
-        [H3] = LaplacianScore(currentViewData, W);
+        % M6=zeros(feature_num,1);
+        % W = dist(currentViewData');
+        % W = -W./max(max(W)); % it's a similarity
+        % [H3] = LaplacianScore(currentViewData, W);
+        [H3,h3Info{i}] = compute_H3_knn_safe(X,graphK);
 
     H = [H1,H2,H3];
     Decision_Matrix= [Decision_Matrix;H];
@@ -97,7 +103,7 @@ W = metricVariance / sum(metricVariance);
 
 [~,S1] = sort(E5,'descend');
 index=S1;
-MVFS1_time = toc(start);
+MVFS2_time = toc(start);
 
 ACC=[];
 NMI=[];
@@ -148,15 +154,15 @@ Recallstd=[Recallstd;std(recall)];
 %ARIstd=[ARIstd;std(ari)];
 end
 
-MVFS1_ACC=ACC;
-MVFS1_ACCstd=ACCstd;
-MVFS1_NMI=NMI;
-MVFS1_NMIstd=NMIstd;
-MVFS1_Fscore=Fscore;
-MVFS1_Fscorestd=Fscorestd;
-MVFS1_Precision=Precision;
-MVFS1_Precisionstd=Precisionstd;
-MVFS1_Recall=Recall;
-MVFS1_Recallstd=Recallstd;
-MVFS1_ARI=ARI;
-MVFS1_ARIstd=ARIstd;
+MVFS2_ACC=ACC;
+MVFS2_ACCstd=ACCstd;
+MVFS2_NMI=NMI;
+MVFS2_NMIstd=NMIstd;
+MVFS2_Fscore=Fscore;
+MVFS2_Fscorestd=Fscorestd;
+MVFS2_Precision=Precision;
+MVFS2_Precisionstd=Precisionstd;
+MVFS2_Recall=Recall;
+MVFS2_Recallstd=Recallstd;
+MVFS2_ARI=ARI;
+MVFS2_ARIstd=ARIstd;
